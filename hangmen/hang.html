@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HangMan</title>
+    <link rel="stylesheet" href="hangg.css">
+    <link rel="icon" href="icon.jpg" type="image/jpg">
+</head>
+<body>
+
+    <div id="overlay" onclick="hideAlert()"></div>
+
+    <div id="alertBox" class="alert-box">
+        <span class="close-btn" onclick="hideAlert()">&times;</span>
+        <p>You WIN !!!!!</p>
+    </div>
+    <div id="alertBox1" class="alert-box1">
+        <span class="close-btn" onclick="hideAlert1()">&times;</span>
+        <p id="youlost">You LOST!</p>
+    </div>
+    <p id="topic"></p>
+    <div class="True">
+        <p id="true"></p>
+    </div>
+    <img src="hangman1.png" id="image">
+    <input type="button" onclick="prepare() " value="Start" id="button">
+    <div id="wrong">
+         <h1>Wrong letters : </h1>
+         <p id="wl"></p>
+    </div>
+    <audio src="won.mp3" hidden id="winsound"></audio>
+    <audio src="lost.mp3" hidden id="lostsound"></audio>
+    <audio src="correct.mp3" hidden id="correct"></audio>
+    <audio src="false.mp3" hidden id="false"></audio>
+    <footer>
+        <div id="credits">
+            <h3>Credits</h3>
+            <ul>
+                <li>Designed by: Tiss Adem</li>
+            </ul>
+        </div>
+    </footer>
+    <script>
+        let topic =["animals","fruits","colors"]
+        let animals = ["dog", "cat", "elephant", "lion", "giraffe", "dolphin", "penguin", "tiger", "rabbit", "horse", "bear", "monkey", "kangaroo", "panda", "cheetah", "koala", "wolf", "zebra", "gorilla", "owl"];
+        let fruits = ["apple", "banana", "orange", "strawberry", "watermelon", "mango", "pineapple", "peach", "kiwi", "avocado", "cherry", "lemon", "blueberry", "raspberry", "pear", "coconut"];
+        let colors = ["red", "blue", "green", "yellow", "orange", "purple", "pink", "brown", "black", "white", "gray", "turquoise", "indigo", "gold", "silver",];
+        function random(){
+            var randomtopic=Math.floor(Math.random() * topic.length)
+            var randomt=topic[randomtopic]
+            if (randomt=="animals"){
+                var word=animals[Math.floor(Math.random()* animals.length)]
+            }
+            else if (randomt=="fruits"){
+                var word=fruits[Math.floor(Math.random()*fruits.length)]
+            }
+            else{
+                var word=colors[Math.floor(Math.random()*colors.length)]
+            }
+            return {word , randomt}
+        }
+        randomm=random()
+        console.log(randomm.word)
+        var e =""
+        var modifiedString=""
+        function prepare(){
+            document.getElementById("topic").innerHTML="The topic is "+ randomm.randomt
+            document.getElementById("button").style.display="none"
+            for (let i = 0;i<randomm.word.length ;i++){
+                e=document.getElementById("true").innerHTML
+                document.getElementById("true").innerHTML=e+'-'
+                
+            }
+            e=e+"-"
+            modifiedString= e
+            var allowedChars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w','x', 'y', 'z'];
+            let b=2
+            let f=0
+            document.addEventListener('keydown', function(event) {
+                var pressedKey = event.key.toLowerCase();
+                
+                let a =0 
+                
+                d=randomm.word.length
+                
+                if (allowedChars.includes(pressedKey)) {
+                    
+
+                    for (let i = 0 ; i<d; i++){
+
+                        if (pressedKey==randomm.word[i] && modifiedString[i]=="-"){ 
+                            let stringArray = modifiedString.split('');
+                            document.getElementById("correct").play()
+                            f++
+                            if (i < e.length) {
+                                stringArray[i] = pressedKey;    
+                            }
+                            
+                            modifiedString = stringArray.join('');
+                            document.getElementById("true").innerHTML=modifiedString
+                            if (f==randomm.word.length){
+                                setTimeout(function() {
+                                    document.getElementById("winsound").play()
+                                    showAlert()
+                                
+                                }, 300);
+                            }
+                            return pressedKey
+                        }
+                        else{
+                            a=a+1
+                        }
+                        
+                    }
+                    if (a==randomm.word.length && b<8){
+                        document.getElementById("false").play()
+                        document.getElementById("image").src="hangman"+b.toString()+".png"
+                        //changed the picture
+                        allowedChars = allowedChars.filter(item => item !==pressedKey)
+                        //removed the letter from the array if it's not included in the word 
+                        c=document.getElementById("wl").innerHTML
+                        document.getElementById("wl").innerHTML=c+" "+pressedKey+" "+"-"
+                        //added the wrong letter in a box for the user 
+                        if(b==7){
+                            setTimeout(function() {
+                                document.getElementById("lostsound").play()
+                                document.getElementById("youlost").innerHTML="YOU LOST !!! the word was "+randomm.word
+                                showAlert1()
+                                
+                            }, 200);
+                        }
+                        b++
+                    }
+                    
+                
+                }
+
+            
+            });
+        }
+
+        function showAlert() {
+            var overlay = document.getElementById('overlay');
+            var alertBox = document.getElementById('alertBox');
+            overlay.style.display = 'block';
+            alertBox.classList.add('show');
+        }
+
+        function hideAlert() {
+            var overlay = document.getElementById('overlay');
+            var alertBox = document.getElementById('alertBox');
+            overlay.style.display = 'none';
+            alertBox.classList.remove('show');
+            location.reload()
+        }
+        function showAlert1() {
+            var overlay = document.getElementById('overlay');
+            var alertBox = document.getElementById('alertBox1');
+            overlay.style.display = 'block';
+            alertBox.classList.add('show');
+        }
+
+        function hideAlert1() {
+            var overlay = document.getElementById('overlay');
+            var alertBox = document.getElementById('alertBox1');
+            overlay.style.display = 'none';
+            alertBox.classList.remove('show');
+            location.reload()
+        }
+
+        
+    </script>
+    
+</body>
+</html>
